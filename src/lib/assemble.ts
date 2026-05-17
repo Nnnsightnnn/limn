@@ -15,7 +15,13 @@ export function assembleNaturalLanguage(slots: PromptSlots): string {
   const subjectPart = slots.subject.trim()
   if (!subjectPart && slots.medium.length === 0) return ''
 
-  const mediumPart = slots.medium.length > 0 ? `${slots.medium.join(' + ')} style` : ''
+  // Append " style" only to chips that don't already end in "style" — otherwise
+  // selections like "Studio Ghibli style" produce ugly "Studio Ghibli style style".
+  const styledMediums = slots.medium.map((m) => {
+    const t = m.trim()
+    return /\bstyle$/i.test(t) ? t : `${t} style`
+  })
+  const mediumPart = styledMediums.length > 0 ? styledMediums.join(' + ') : ''
   const environmentPart =
     slots.environment.length > 0 ? `in ${joinParts(slots.environment, ', ')}` : ''
   const timePart = slots.timeOfDay.length > 0 ? `at ${joinParts(slots.timeOfDay, ', ')}` : ''
