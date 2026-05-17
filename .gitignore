@@ -26,11 +26,12 @@ yarn-error.log*
 *.key
 *.pem
 
-# Build / dependencies (reserved for future)
+# Build / dependencies
 node_modules/
 dist/
 build/
 .cache/
+*.tsbuildinfo
 
 # OS-level junk
 Thumbs.db
