@@ -1,0 +1,102 @@
+### MidJourney v6.1 Cheat Sheet
+
+#### **Prompt Structure:**
+``` 
+[Subject] in a [Medium] style, [Environment], [Lighting], [Color], [Mood], [Composition] --[Parameters]
+```
+
+#### **Key Prompt Elements:**
+
+**1. Subject:**  
+Define what the image is about.
+- **Person:** A medieval knight, a cyberpunk android, a woman in 18th-century attire  
+- **Animal:** Majestic eagle, surreal underwater fish, glowing fox  
+- **Character:** Fantasy elf, sci-fi robot, Victorian vampire  
+- **Location:** Gothic castle, a bustling city, serene mountain range  
+- **Object:** Ancient artifact, futuristic gadget, vintage camera  
+
+**2. Medium:**  
+Specify the artistic or photographic style.  
+- Photo  
+- Painting  
+- Illustration  
+- Sculpture  
+- Doodle  
+- Tapestry  
+
+**3. Environment:**  
+Set the scene where the subject exists.  
+- Indoors  
+- Outdoors  
+- On the moon  
+- Underwater  
+- In the city  
+
+**4. Lighting:**  
+Control the light in your image.  
+- Soft  
+- Ambient  
+- Overcast  
+- Neon  
+- Studio lights  
+
+**5. Color:**  
+Adjust the palette.  
+- Vibrant  
+- Muted  
+- Bright  
+- Monochromatic  
+- Colorful  
+- Black and white  
+- Pastel  
+
+**6. Mood:**  
+Convey emotions or energy.  
+- Sedate  
+- Calm  
+- Raucous  
+- Energetic  
+
+**7. Composition:**  
+Frame your image.  
+- Portrait  
+- Headshot  
+- Closeup  
+- Birds-eye view  
+
+---
+
+#### **Parameters for Fine-Tuning**
+
+- `--ar Aspect Ratio:` Define width-to-height ratio (e.g., `--ar 16:9`, `--ar 1:1`)  
+- `--v` Version (e.g., `--v 6.1` for version 6.1 features)  
+- `--q Quality:` Image quality, higher values improve detail (e.g., `--q 2`)  
+- `--style` Artistic intensity or stylization level (e.g., `--style 4`)  
+- `--no` Negative prompts to exclude (e.g., `--no background`)  
+- `--chaos` Randomness factor (0-100 for variety in results)  
+- `--tile` Enables seamless tiling for patterns  
+- `--seed` Consistent results with the same input  
+- `--testp` Testing parameter for Pro mode  
+
+---
+
+#### **Example Prompts**
+
+**Example 1:**  
+*"Cyberpunk android in a neon-lit city, photo style, outdoors, vibrant colors, energetic mood, portrait composition --ar 16:9 --q 2 --chaos 50"*  
+
+**Example 2:**  
+*"Majestic eagle in an oil painting style, flying over mountains at sunrise, warm ambient lighting, muted tones, serene mood, birds-eye view --ar 3:2 --seed 12345"*  
+
+**Example 3:**  
+*"Underwater coral reef scene, illustration style, soft light, pastel colors, calm mood, wide composition --tile"*  
+
+---
+
+#### **Tips for Advanced Prompts**
+- Combine elements for complex imagery (e.g., "A Victorian vampire in a sci-fi city, tapestry style").  
+- Use negative prompts to remove unwanted features (e.g., `--no humans`).  
+- Adjust chaos for creative exploration (`--chaos 80` for wild variations).  
+- Use seed numbers for reproducibility in iterative designs.  
+
+This cheat sheet provides a flexible structure to build your MidJourney prompts and achieve a wide range of artistic effects!

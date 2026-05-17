@@ -1,0 +1,41 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cursorignore
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env / secrets — never commit API keys
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# Build / dependencies (reserved for future)
+node_modules/
+dist/
+build/
+.cache/
+
+# OS-level junk
+Thumbs.db
+desktop.ini
+
+# Scratch
+scratch/
+tmp/

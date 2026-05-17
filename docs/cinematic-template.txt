@@ -1,0 +1,180 @@
+A cinematic scene from [YEAR, MOVIE GENRE, MOVIE NAME], [SHOT TYPE], [SCENE/SUBJECT/ACTION], captured by [CINEMATIC CAMERA], film directed by [DIRECTOR], [EMOTION], [LIGHTING] --ar 16:9 --style raw --v 5.1
+
+SHOT TYPES
+long shot (wide shot)
+medium shot
+closeup shot
+extreme closeup shot
+full 
+over the shoulder
+point of view
+low angle 
+high angle 
+eye level 
+dutch angle  (tilt)
+bird's eye view 
+drone
+rule of thirds
+candid
+silhoutte
+
+
+
+subject
+
+time of day
+
+type of camera
+
+type of lens
+
+type of lighting
+
+redo this prompt "BLANK" with these
+[subject]  [time of day]  [type of camera] [type of lens]  [type of lighting]
+incorporated in the prompt.
+here's an example:
+redo this prompt "A cozy living room with a roaring fire and a stack of books" with these [subject]  [time of day]  [type of camera] [type of lens]  [type of lighting] incorporated in the prompt.
+
+"A warm and inviting living room at twilight, captured through the lens of a vintage film camera with a wide-angle lens, showcasing the soft, ambient glow of the roaring fire and the golden lamplight illuminating a stack of well-loved books."
+
+-------  MEDIUM   -------
+
+
+
+logo ink svg 2d
+
+tarot card
+
+psychedellic
+
+Knolling (exploded parts top down view)
+isometric (3d)
+
+Watercolor painting
+Gouache painting
+Charcoal drawing
+Pastel drawing
+Collage
+
+Graffiti
+Spray paint art
+
+Mosaic
+Stained glass
+
+Fresco
+Ink drawing
+
+Calligraphy
+Screen printing
+Relief printing
+Lithography
+Encaustic painting
+Digital painting
+
+Disney Pixar 2D Art
+
+Pixel art
+Vector art
+Photorealism
+Pointillism
+Art Nouveau
+Art Deco
+
+dvd screengrab
+
+Abstract expressionism
+Cubism
+Surrealism
+Pop art
+Minimalism
+Impressionism
+Fauvism
+Expressionism
+Dadaism
+Futurism
+Constructivism
+Suprematism
+De Stijl
+Op art
+
+
+PastelPunk
+
+Pointillism
+Chiaroscuro
+
+Land art
+Performance art
+Installation art
+Conceptual art
+Kinetic art
+Outsider art
+Street art
+Murals
+Tape art
+Qu
+
+Quilling
+Origami
+Marbling
+Scratchboard art
+Stippling
+Hatching
+Contour drawing
+Tessellations
+Papercutting
+Photomontage
+Typography
+Textile art
+
+Embroidery
+Crochet
+Knitting
+Weaving
+Macramé
+Felting
+Batik
+Pottery
+Ceramic sculpture
+Glassblowing
+Sand art
+Ice sculpting
+Chalk art
+
+Body painting
+Pyrography
+Metal art
+Wire sculpture
+Paper mâché
+Shadow boxes
+Assemblage
+Stop-motion animation
+Puppetry
+Collagraphy
+Monoprinting
+Intaglio
+
+Mezzotint
+Drypoint
+Aquatint
+Soft-ground etching
+Cyanotype
+Gum bichromate
+Photogravure
+Hand-coloring photographs
+Sumi-e (Japanese ink painting)
+Ebru (Turkish marbling)
+Mad Magazine
+
+Madhubani (Indian folk art)
+Kintsugi (Japanese pottery repair)
+Raku pottery
+Murrine (Italian glass technique)
+Cloisonné (enamel art)
+
+RAW photo
+
+
+Mood Board
