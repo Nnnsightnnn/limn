@@ -2,9 +2,13 @@
 
 > *limn* (verb) — to depict or describe in painting or words.
 
+![Limn wizard — Medium & Style step with live MidJourney output](./docs/hero.png)
+
 An open-source, AI-scaffolded prompt designer for image generation. Start from nothing with a guided wizard, paste a half-formed idea and let the chip library + AI flesh it out, or parse an existing prompt back into editable slots. Model-agnostic output for MidJourney, Stable Diffusion, FLUX, DALL·E, and plain natural language.
 
-> **Status:** v0 scaffold — vertical-slice build for MidJourney is in progress.
+🔗 **Live demo:** [nnnsightnnn.github.io/limn](https://nnnsightnnn.github.io/limn/)
+
+> **Status:** v0.1 — MidJourney wizard + free-form modes shipped. Multi-model output, prompt parsing, and library polish coming in v0.2+.
 
 ## Why another prompt tool
 
