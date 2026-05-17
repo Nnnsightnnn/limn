@@ -4,12 +4,16 @@ export function Header({
   mode,
   setMode,
   onOpenSettings,
+  onNewSession,
   hasKey,
+  dirty,
 }: {
   mode: Mode
   setMode: (m: Mode) => void
   onOpenSettings: () => void
+  onNewSession: () => void
   hasKey: boolean
+  dirty: boolean
 }) {
   return (
     <header className="border-b border-ink-800 bg-ink-900/60 backdrop-blur sticky top-0 z-10">
@@ -31,17 +35,35 @@ export function Header({
           </ModeButton>
         </nav>
 
-        <button
-          type="button"
-          onClick={onOpenSettings}
-          className="text-sm text-ink-400 hover:text-ink-100 transition-colors flex items-center gap-1.5"
-          aria-label="Open settings"
-        >
-          <span>⚙</span>
-          {!hasKey && (
-            <span className="text-xs text-ember-400 hidden sm:inline">add API key</span>
-          )}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onNewSession}
+            title={dirty ? 'Clear the current prompt (will confirm)' : 'Start a fresh prompt'}
+            className={
+              'text-xs px-3 py-1.5 rounded-md border transition-colors flex items-center gap-1.5 ' +
+              (dirty
+                ? 'bg-ink-800 border-ink-700 text-ink-100 hover:border-ember-500 hover:text-ember-400'
+                : 'bg-transparent border-ink-800 text-ink-400 hover:text-ink-100 hover:border-ink-700')
+            }
+            aria-label="New session"
+          >
+            <span aria-hidden>+</span>
+            <span>New</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onOpenSettings}
+            className="text-sm text-ink-400 hover:text-ink-100 transition-colors flex items-center gap-1.5"
+            aria-label="Open settings"
+          >
+            <span>⚙</span>
+            {!hasKey && (
+              <span className="text-xs text-ember-400 hidden sm:inline">add API key</span>
+            )}
+          </button>
+        </div>
       </div>
     </header>
   )

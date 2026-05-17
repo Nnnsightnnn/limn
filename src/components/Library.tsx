@@ -1,9 +1,11 @@
 // Saved-prompt strip along the bottom. Click to load, × to delete.
+//
+// "New session" lives in the header now — this footer is purely the library list.
 
 import type { LimnState } from '../lib/useLimnState'
 
 export function Library({ state }: { state: LimnState }) {
-  const { library, loadItem, deleteItem, resetSlots } = state
+  const { library, loadItem, deleteItem } = state
 
   if (library.length === 0) {
     return (
@@ -19,14 +21,6 @@ export function Library({ state }: { state: LimnState }) {
     <div className="border-t border-ink-800 bg-ink-950/80 sticky bottom-0 backdrop-blur">
       <div className="max-w-6xl mx-auto px-6 py-3 flex items-center gap-3 overflow-x-auto">
         <span className="text-xs text-ink-500 shrink-0">📚 Library</span>
-        <button
-          type="button"
-          onClick={resetSlots}
-          className="text-xs text-ink-400 hover:text-ember-400 shrink-0"
-          title="Clear current session (does not delete library)"
-        >
-          + New
-        </button>
         <div className="h-4 w-px bg-ink-800 shrink-0" />
         <div className="flex gap-2">
           {library.map((item) => (

@@ -53,7 +53,10 @@ export interface LimnState {
   slots: PromptSlots
   setSlots: (updater: (prev: PromptSlots) => PromptSlots) => void
   toggleChip: (slot: keyof PromptSlots, value: string) => void
+  /** Clears slots + freeform, but keeps MJ params (they're a user preference). */
   resetSlots: () => void
+  /** True when there's any unsaved-looking work in slots or freeform. */
+  isDirty: boolean
 
   freeform: string
   setFreeform: (s: string) => void
@@ -87,6 +90,26 @@ const MULTI_SELECT_SLOTS: Set<keyof PromptSlots> = new Set([
   'cameraAngle',
   'cameraLens',
 ])
+
+/** True when any slot or the freeform text has non-default content. */
+function computeIsDirty(slots: PromptSlots, freeform: string): boolean {
+  if (freeform.trim().length > 0) return true
+  if (slots.subject.trim().length > 0) return true
+  if (slots.subjectSubType !== null) return true
+  if (slots.artists.trim().length > 0) return true
+  return (
+    slots.medium.length > 0 ||
+    slots.environment.length > 0 ||
+    slots.lighting.length > 0 ||
+    slots.timeOfDay.length > 0 ||
+    slots.mood.length > 0 ||
+    slots.color.length > 0 ||
+    slots.composition.length > 0 ||
+    slots.shotType.length > 0 ||
+    slots.cameraAngle.length > 0 ||
+    slots.cameraLens.length > 0
+  )
+}
 
 export function useLimnState(): LimnState {
   const [mode, setMode] = useState<Mode>(() => loadJSON<Mode>('mode', 'wizard'))
@@ -170,6 +193,8 @@ export function useLimnState(): LimnState {
     setLibrary((prev) => prev.filter((i) => i.id !== id))
   }, [])
 
+  const isDirty = useMemo(() => computeIsDirty(slots, freeform), [slots, freeform])
+
   return useMemo(
     () => ({
       mode,
@@ -178,6 +203,7 @@ export function useLimnState(): LimnState {
       setSlots,
       toggleChip,
       resetSlots,
+      isDirty,
       freeform,
       setFreeform,
       params,
@@ -195,6 +221,7 @@ export function useLimnState(): LimnState {
       setSlots,
       toggleChip,
       resetSlots,
+      isDirty,
       freeform,
       params,
       setParams,

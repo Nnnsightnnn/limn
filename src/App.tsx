@@ -11,13 +11,25 @@ export default function App() {
   const state = useLimnState()
   const [settingsOpen, setSettingsOpen] = useState(false)
 
+  function handleNewSession() {
+    if (state.isDirty) {
+      const ok = confirm(
+        'Start a new prompt? Your current in-progress work will be cleared (the library and your MidJourney parameter preferences are kept).',
+      )
+      if (!ok) return
+    }
+    state.resetSlots()
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-ink-950 text-ink-100">
       <Header
         mode={state.mode}
         setMode={state.setMode}
         onOpenSettings={() => setSettingsOpen(true)}
+        onNewSession={handleNewSession}
         hasKey={Boolean(state.settings.openrouterKey)}
+        dirty={state.isDirty}
       />
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-6 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
