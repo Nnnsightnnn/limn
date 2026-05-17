@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink-50: #faf6ef;
+  --color-ink-100: #f0e6d8;
+  --color-ink-200: #d8c5a3;
+  --color-ink-300: #c9b89d;
+  --color-ink-400: #a08866;
+  --color-ink-500: #7a6447;
+  --color-ink-600: #5a4a35;
+  --color-ink-700: #3a3025;
+  --color-ink-800: #2a2520;
+  --color-ink-900: #1e1a16;
+  --color-ink-950: #14110f;
+
+  --color-ember-400: #f0b46b;
+  --color-ember-500: #e8a857;
+  --color-ember-600: #c9852f;
+  --color-ember-700: #9a6520;
+}
+
+html, body, #root {
+  height: 100%;
+}
