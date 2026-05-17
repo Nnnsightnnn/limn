@@ -40,3 +40,10 @@ desktop.ini
 # Scratch
 scratch/
 tmp/
+
+# --- Claude personal config (local-only) ---
+.claude/
+CLAUDE.md
+**/CLAUDE.md
+# --- /Claude ---
+
