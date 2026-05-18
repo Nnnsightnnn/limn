@@ -6,6 +6,7 @@ import { ALL_VOCAB } from '../data/vocabulary'
 import { enhanceFreeform, parseToSlots } from '../lib/openrouter'
 import type { LimnState } from '../lib/useLimnState'
 import { Chip } from './chip-primitives'
+import { PopularPrompts } from './PopularPrompts'
 
 export function FreeformMode({ state }: { state: LimnState }) {
   const { freeform, setFreeform, setSlots, setMode, settings } = state
@@ -112,6 +113,23 @@ export function FreeformMode({ state }: { state: LimnState }) {
             </span>
           )}
         </div>
+
+        {freeform.trim() === '' && (
+          <PopularPrompts
+            heading="Popular prompts to start with"
+            subheading="Click any prompt to drop it into the textarea above."
+            onPick={(p) => {
+              setFreeform(p.prompt)
+              requestAnimationFrame(() => {
+                const ta = textareaRef.current
+                if (!ta) return
+                ta.focus()
+                const end = p.prompt.length
+                ta.setSelectionRange(end, end)
+              })
+            }}
+          />
+        )}
       </div>
 
       <aside className="rounded-xl border border-ink-800 bg-ink-900/40 p-3 max-h-[640px] overflow-y-auto">

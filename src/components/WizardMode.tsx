@@ -22,6 +22,7 @@ import {
 import { suggestForSlot } from '../lib/openrouter'
 import type { LimnState } from '../lib/useLimnState'
 import { AISuggestButton, ChipCloud, ChipRow } from './chip-primitives'
+import { PopularPrompts } from './PopularPrompts'
 import { SlotCard } from './SlotCard'
 
 interface StepDef {
@@ -40,10 +41,25 @@ const STEPS: StepDef[] = [
 ]
 
 export function WizardMode({ state }: { state: LimnState }) {
-  const { slots, setSlots, toggleChip, params, setParams, settings } = state
+  const { slots, setSlots, toggleChip, params, setParams, settings, setFreeform, setMode } = state
 
   const [active, setActive] = useState(0)
   const [dir, setDir] = useState<1 | -1>(1)
+
+  const isWizardEmpty =
+    !slots.subject.trim() &&
+    !slots.subjectSubType &&
+    !slots.artists.trim() &&
+    slots.medium.length === 0 &&
+    slots.environment.length === 0 &&
+    slots.lighting.length === 0 &&
+    slots.timeOfDay.length === 0 &&
+    slots.mood.length === 0 &&
+    slots.color.length === 0 &&
+    slots.composition.length === 0 &&
+    slots.shotType.length === 0 &&
+    slots.cameraAngle.length === 0 &&
+    slots.cameraLens.length === 0
 
   function go(next: number) {
     const clamped = Math.max(0, Math.min(STEPS.length - 1, next))
@@ -433,6 +449,17 @@ export function WizardMode({ state }: { state: LimnState }) {
         onPrev={() => go(active - 1)}
         onNext={() => go(active + 1)}
       />
+
+      {isWizardEmpty && (
+        <PopularPrompts
+          heading="Or start from a popular prompt"
+          subheading="Click to load into Free-form — you can refine it there, or use Parse to wizard to fill these slots."
+          onPick={(p) => {
+            setFreeform(p.prompt)
+            setMode('freeform')
+          }}
+        />
+      )}
     </div>
   )
 }
