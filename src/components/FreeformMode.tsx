@@ -1,5 +1,6 @@
-// Free-form textarea with a categorized chip sidebar that injects vocabulary at the cursor,
-// plus AI-assist actions: enhance, parse-to-slots.
+// The Free Studio — a magazine "essay form" where the writer drafts freely.
+// Big italic textarea, AI actions on the side, and an Index sidebar (the
+// chip library, presented as a magazine index of available vocabulary).
 
 import { useRef, useState } from 'react'
 import { ALL_VOCAB } from '../data/vocabulary'
@@ -30,7 +31,6 @@ export function FreeformMode({ state }: { state: LimnState }) {
     const insert = (needsLeadingSep ? ', ' : '') + value + (needsTrailingSep ? ', ' : '')
     const next = before + insert + after
     setFreeform(next)
-    // Restore cursor after the inserted value
     requestAnimationFrame(() => {
       ta.focus()
       const pos = (before + insert).length
@@ -79,105 +79,218 @@ export function FreeformMode({ state }: { state: LimnState }) {
   }
 
   return (
-    <div className="grid lg:grid-cols-[1fr_280px] gap-4">
-      <div className="space-y-3">
-        <textarea
-          ref={textareaRef}
-          value={freeform}
-          onChange={(e) => setFreeform(e.target.value)}
-          placeholder="Describe whatever's in your head. Type a rough idea, or paste an existing prompt to refine it."
-          rows={14}
-          className="w-full bg-ink-950 border border-ink-800 rounded-xl px-4 py-3 text-sm text-ink-100 placeholder:text-ink-500 focus:outline-none focus:border-ember-500 leading-relaxed"
-        />
+    <div className="space-y-6">
+      <header
+        style={{
+          borderBottom: '2px solid var(--color-rule)',
+          paddingBottom: 14,
+        }}
+      >
+        <div className="kicker">The Free Studio &nbsp;·&nbsp; The Essay Form</div>
+        <h2
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(36px, 5vw, 56px)',
+            fontWeight: 500,
+            lineHeight: 1,
+            letterSpacing: '-0.02em',
+            margin: '8px 0 0',
+            color: 'var(--color-ink)',
+          }}
+        >
+          Write your way into <em style={{ color: 'var(--color-accent)', fontWeight: 400 }}>the picture</em>.
+        </h2>
+        <p
+          style={{
+            fontFamily: 'var(--font-serif)',
+            fontStyle: 'italic',
+            fontSize: 18,
+            color: 'var(--color-ink-soft)',
+            margin: '6px 0 0',
+          }}
+        >
+          A blank page and the Index. Draft anything; have the Editor tidy it; or parse to the Wizard.
+        </p>
+      </header>
 
-        <div className="flex flex-wrap gap-2 items-center">
-          <button
-            type="button"
-            onClick={doEnhance}
-            disabled={busy !== null || !freeform.trim()}
-            className="text-xs inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-ember-500 text-ink-950 font-medium hover:bg-ember-400 disabled:opacity-40 transition-colors"
-          >
-            {busy === 'enhance' ? '· · ·' : '✨'} Enhance with AI
-          </button>
-          <button
-            type="button"
-            onClick={doParse}
-            disabled={busy !== null || !freeform.trim()}
-            className="text-xs inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-ink-800 border border-ink-700 text-ink-200 hover:border-ember-500 hover:text-ember-400 disabled:opacity-40 transition-colors"
-          >
-            {busy === 'parse' ? '· · ·' : '⇄'} Parse to wizard
-          </button>
-          {error && (
-            <span className="text-xs text-red-400/90 bg-red-950/40 border border-red-900/60 rounded-md px-2.5 py-1.5">
-              {error}
-            </span>
+      <div className="grid lg:grid-cols-[1fr_300px] gap-8">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <textarea
+            ref={textareaRef}
+            value={freeform}
+            onChange={(e) => setFreeform(e.target.value)}
+            placeholder="Describe whatever's in your head. A rough idea, a paragraph, a paste from somewhere else — anything."
+            rows={14}
+            className="field-textarea"
+            style={{ minHeight: 320 }}
+          />
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
+            <button
+              type="button"
+              onClick={doEnhance}
+              disabled={busy !== null || !freeform.trim()}
+              className="btn primary"
+            >
+              {busy === 'enhance' ? '· · ·' : '✻'} Have the Editor enhance
+            </button>
+            <button
+              type="button"
+              onClick={doParse}
+              disabled={busy !== null || !freeform.trim()}
+              className="btn"
+            >
+              {busy === 'parse' ? '· · ·' : '⇄'} Parse to the Wizard
+            </button>
+            {error && (
+              <span
+                style={{
+                  padding: '6px 12px',
+                  border: '1px solid var(--color-accent)',
+                  background: 'var(--color-accent-soft)',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 10.5,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: 'var(--color-accent-deep)',
+                }}
+              >
+                {error}
+              </span>
+            )}
+          </div>
+
+          {freeform.trim() === '' && (
+            <PopularPrompts
+              heading="Popular plates to start from"
+              subheading="Click any plate to drop it into the essay above."
+              onPick={(p) => {
+                setFreeform(p.prompt)
+                requestAnimationFrame(() => {
+                  const ta = textareaRef.current
+                  if (!ta) return
+                  ta.focus()
+                  const end = p.prompt.length
+                  ta.setSelectionRange(end, end)
+                })
+              }}
+            />
           )}
         </div>
 
-        {freeform.trim() === '' && (
-          <PopularPrompts
-            heading="Popular prompts to start with"
-            subheading="Click any prompt to drop it into the textarea above."
-            onPick={(p) => {
-              setFreeform(p.prompt)
-              requestAnimationFrame(() => {
-                const ta = textareaRef.current
-                if (!ta) return
-                ta.focus()
-                const end = p.prompt.length
-                ta.setSelectionRange(end, end)
-              })
+        <aside
+          aria-label="Index"
+          style={{
+            border: '1px solid var(--color-rule)',
+            padding: 14,
+            maxHeight: 640,
+            overflowY: 'auto',
+            background: 'var(--color-paper)',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              justifyContent: 'space-between',
+              marginBottom: 10,
+              paddingBottom: 8,
+              borderBottom: '1px solid var(--color-rule)',
             }}
-          />
-        )}
-      </div>
-
-      <aside className="rounded-xl border border-ink-800 bg-ink-900/40 p-3 max-h-[640px] overflow-y-auto">
-        <div className="text-xs uppercase tracking-wider text-ink-400 mb-2 sticky top-0 bg-ink-900/80 backdrop-blur py-1">
-          Chip library
-        </div>
-        <div className="space-y-1">
-          {Object.entries(ALL_VOCAB).map(([catName, cat]) => {
-            const open = openCat === catName
-            return (
-              <div key={catName} className="border-b border-ink-800 last:border-0">
-                <button
-                  type="button"
-                  onClick={() => setOpenCat(open ? null : catName)}
-                  className="w-full flex items-center justify-between py-2 text-sm text-ink-200 hover:text-ember-400 transition-colors"
+          >
+            <div
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontStyle: 'italic',
+                fontWeight: 500,
+                fontSize: 20,
+                color: 'var(--color-ink)',
+              }}
+            >
+              Index
+            </div>
+            <div
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: 9.5,
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                color: 'var(--color-ink-mute)',
+              }}
+            >
+              of available vocabulary
+            </div>
+          </div>
+          <div>
+            {Object.entries(ALL_VOCAB).map(([catName, cat]) => {
+              const open = openCat === catName
+              return (
+                <div
+                  key={catName}
+                  style={{
+                    borderBottom: '1px solid var(--color-rule-soft)',
+                  }}
                 >
-                  <span>{catName}</span>
-                  <span className="text-xs text-ink-500">{open ? '−' : '+'}</span>
-                </button>
-                {open && (
-                  <div className="pb-3 space-y-2">
-                    {cat.groups.map((g) => (
-                      <div key={g.name}>
-                        <div className="text-[10px] uppercase tracking-wider text-ink-500 mb-1">
-                          {g.name}
+                  <button
+                    type="button"
+                    onClick={() => setOpenCat(open ? null : catName)}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'baseline',
+                      justifyContent: 'space-between',
+                      padding: '10px 0',
+                      background: 'none',
+                      border: 0,
+                      cursor: 'pointer',
+                      fontFamily: 'var(--font-serif)',
+                      fontSize: 16,
+                      color: 'var(--color-ink)',
+                      fontStyle: open ? 'italic' : 'normal',
+                    }}
+                  >
+                    <span>{catName}</span>
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: 11,
+                        color: 'var(--color-ink-mute)',
+                      }}
+                    >
+                      {open ? '—' : '+'}
+                    </span>
+                  </button>
+                  {open && (
+                    <div style={{ paddingBottom: 12 }}>
+                      {cat.groups.map((g) => (
+                        <div key={g.name} style={{ marginBottom: 8 }}>
+                          <div className="group-label" style={{ margin: '6px 0 6px' }}>
+                            {g.name}
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {g.chips.map((c, i) => {
+                              const label = typeof c === 'string' ? c : c.label
+                              return (
+                                <Chip
+                                  key={label}
+                                  label={label}
+                                  active={false}
+                                  onClick={() => insertAtCursor(label)}
+                                  tight={i % 3 === 1}
+                                />
+                              )
+                            })}
+                          </div>
                         </div>
-                        <div className="flex flex-wrap gap-1.5">
-                          {g.chips.map((c) => {
-                            const label = typeof c === 'string' ? c : c.label
-                            return (
-                              <Chip
-                                key={label}
-                                label={label}
-                                active={false}
-                                onClick={() => insertAtCursor(label)}
-                              />
-                            )
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      </aside>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </aside>
+      </div>
     </div>
   )
 }

@@ -1,8 +1,11 @@
-// Slide-in panel for OpenRouter API key + model selection.
+// Slide-in "Editorial Notes" panel — OpenRouter key, model, and Edition toggle
+// (paper / evening). Matches the magazine palette.
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { SEED_MODELS } from '../lib/openrouter'
 import type { LimnState } from '../lib/useLimnState'
+
+type Edition = 'paper' | 'evening'
 
 export function SettingsDrawer({
   state,
@@ -16,6 +19,18 @@ export function SettingsDrawer({
   const { settings, setSettings } = state
   const [showKey, setShowKey] = useState(false)
 
+  // Edition (paper/evening) is a visual preference — stored on document for now;
+  // not persisted in `Settings` to avoid a storage migration.
+  const [edition, setEdition] = useState<Edition>(() => {
+    const stored = localStorage.getItem('limn:edition')
+    return stored === 'evening' ? 'evening' : 'paper'
+  })
+  useEffect(() => {
+    document.documentElement.dataset.edition = edition
+    document.body.dataset.edition = edition
+    localStorage.setItem('limn:edition', edition)
+  }, [edition])
+
   if (!open) return null
 
   return (
@@ -24,105 +39,214 @@ export function SettingsDrawer({
         type="button"
         aria-label="Close settings"
         onClick={onClose}
-        className="fixed inset-0 bg-black/50 z-20"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'oklch(0 0 0 / 0.45)',
+          zIndex: 60,
+          border: 0,
+          cursor: 'default',
+        }}
       />
-      <aside className="fixed right-0 top-0 bottom-0 w-full max-w-sm bg-ink-950 border-l border-ink-800 z-30 overflow-y-auto">
-        <div className="p-5 space-y-5">
-          <header className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-ink-100">Settings</h2>
+      <aside
+        style={{
+          position: 'fixed',
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: '100%',
+          maxWidth: 420,
+          background: 'var(--color-paper)',
+          borderLeft: '1px solid var(--color-rule)',
+          zIndex: 70,
+          overflowY: 'auto',
+          color: 'var(--color-ink)',
+        }}
+      >
+        <div style={{ padding: '32px 28px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <header
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              justifyContent: 'space-between',
+              paddingBottom: 12,
+              borderBottom: '2px solid var(--color-rule)',
+            }}
+          >
+            <div>
+              <div className="kicker">Editorial Notes</div>
+              <h2
+                style={{
+                  margin: '6px 0 0',
+                  fontFamily: 'var(--font-display)',
+                  fontWeight: 500,
+                  fontSize: 36,
+                  letterSpacing: '-0.01em',
+                  lineHeight: 1,
+                  color: 'var(--color-ink)',
+                }}
+              >
+                Settings
+              </h2>
+            </div>
             <button
               type="button"
               onClick={onClose}
-              className="text-ink-400 hover:text-ink-100"
               aria-label="Close"
+              style={{
+                background: 'none',
+                border: 0,
+                cursor: 'pointer',
+                color: 'var(--color-ink-mute)',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 22,
+                lineHeight: 1,
+              }}
             >
               ×
             </button>
           </header>
 
-          <section className="space-y-3">
-            <div>
-              <div className="text-xs uppercase tracking-wider text-ink-400 mb-1.5">
-                OpenRouter API key
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type={showKey ? 'text' : 'password'}
-                  value={settings.openrouterKey}
-                  onChange={(e) =>
-                    setSettings((p) => ({ ...p, openrouterKey: e.target.value.trim() }))
-                  }
-                  placeholder="sk-or-v1-..."
-                  className="flex-1 bg-ink-900 border border-ink-800 rounded-md px-3 py-1.5 text-sm font-mono text-ink-100 placeholder:text-ink-500 focus:outline-none focus:border-ember-500"
-                  autoComplete="off"
-                  spellCheck={false}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowKey((s) => !s)}
-                  className="text-xs px-2.5 py-1.5 rounded-md border border-ink-700 text-ink-300 hover:border-ember-500 hover:text-ember-400"
-                >
-                  {showKey ? 'hide' : 'show'}
-                </button>
-              </div>
-              <p className="text-xs text-ink-500 mt-1.5">
-                Stored only in <code className="text-ink-400">localStorage</code> on this device.
-                Get one at{' '}
-                <a
-                  href="https://openrouter.ai/keys"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-ember-400 underline underline-offset-2"
-                >
-                  openrouter.ai/keys
-                </a>
-                .
-              </p>
-            </div>
-
-            <div>
-              <div className="text-xs uppercase tracking-wider text-ink-400 mb-1.5">Model</div>
+          <section>
+            <div className="group-label">OpenRouter API key</div>
+            <div style={{ display: 'flex', gap: 8 }}>
               <input
-                type="text"
-                list="limn-model-list"
-                value={settings.openrouterModel}
+                type={showKey ? 'text' : 'password'}
+                value={settings.openrouterKey}
                 onChange={(e) =>
-                  setSettings((p) => ({ ...p, openrouterModel: e.target.value.trim() }))
+                  setSettings((p) => ({ ...p, openrouterKey: e.target.value.trim() }))
                 }
-                placeholder="anthropic/claude-sonnet-4"
-                className="w-full bg-ink-900 border border-ink-800 rounded-md px-3 py-1.5 text-sm font-mono text-ink-100 placeholder:text-ink-500 focus:outline-none focus:border-ember-500"
+                placeholder="sk-or-v1-..."
+                className="field-input"
+                style={{ fontFamily: 'var(--font-mono)', fontStyle: 'normal', fontSize: 13 }}
+                autoComplete="off"
+                spellCheck={false}
               />
-              <datalist id="limn-model-list">
-                {SEED_MODELS.map((m) => (
-                  <option key={m} value={m} />
-                ))}
-              </datalist>
-              <p className="text-xs text-ink-500 mt-1.5">
-                Any{' '}
-                <a
-                  href="https://openrouter.ai/models"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-ember-400 underline underline-offset-2"
-                >
-                  OpenRouter model ID
-                </a>{' '}
-                works. The seeded list is just a starting point.
-              </p>
+              <button
+                type="button"
+                onClick={() => setShowKey((s) => !s)}
+                className="btn"
+              >
+                {showKey ? 'hide' : 'show'}
+              </button>
             </div>
+            <p
+              style={{
+                marginTop: 10,
+                fontFamily: 'var(--font-serif)',
+                fontStyle: 'italic',
+                fontSize: 14,
+                lineHeight: 1.5,
+                color: 'var(--color-ink-soft)',
+              }}
+            >
+              Stored only in <code style={{ fontFamily: 'var(--font-mono)', fontStyle: 'normal' }}>localStorage</code>{' '}
+              on this device. Get one at{' '}
+              <a
+                href="https://openrouter.ai/keys"
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}
+              >
+                openrouter.ai/keys
+              </a>
+              .
+            </p>
           </section>
 
-          <footer className="pt-4 border-t border-ink-800 text-xs text-ink-500 space-y-1">
-            <p>
+          <section>
+            <div className="group-label">Model</div>
+            <input
+              type="text"
+              list="limn-model-list"
+              value={settings.openrouterModel}
+              onChange={(e) =>
+                setSettings((p) => ({ ...p, openrouterModel: e.target.value.trim() }))
+              }
+              placeholder="anthropic/claude-sonnet-4"
+              className="field-input"
+              style={{ fontFamily: 'var(--font-mono)', fontStyle: 'normal', fontSize: 13 }}
+            />
+            <datalist id="limn-model-list">
+              {SEED_MODELS.map((m) => (
+                <option key={m} value={m} />
+              ))}
+            </datalist>
+            <p
+              style={{
+                marginTop: 10,
+                fontFamily: 'var(--font-serif)',
+                fontStyle: 'italic',
+                fontSize: 14,
+                lineHeight: 1.5,
+                color: 'var(--color-ink-soft)',
+              }}
+            >
+              Any{' '}
+              <a
+                href="https://openrouter.ai/models"
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}
+              >
+                OpenRouter model ID
+              </a>{' '}
+              works. The seeded list is just a starting point.
+            </p>
+          </section>
+
+          <section>
+            <div className="group-label">Edition</div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                type="button"
+                className={'btn' + (edition === 'paper' ? ' primary' : '')}
+                onClick={() => setEdition('paper')}
+              >
+                Paper
+              </button>
+              <button
+                type="button"
+                className={'btn' + (edition === 'evening' ? ' primary' : '')}
+                onClick={() => setEdition('evening')}
+              >
+                Evening
+              </button>
+            </div>
+            <p
+              style={{
+                marginTop: 10,
+                fontFamily: 'var(--font-serif)',
+                fontStyle: 'italic',
+                fontSize: 14,
+                lineHeight: 1.5,
+                color: 'var(--color-ink-soft)',
+              }}
+            >
+              Paper: cream and ink, like a quarterly. Evening: art-book dark for late drafting.
+            </p>
+          </section>
+
+          <footer
+            style={{
+              paddingTop: 16,
+              borderTop: '1px solid var(--color-rule)',
+              fontFamily: 'var(--font-serif)',
+              fontSize: 14,
+              color: 'var(--color-ink-soft)',
+              lineHeight: 1.5,
+            }}
+          >
+            <p style={{ margin: 0 }}>
               Limn keeps everything local. Your key and prompt library never leave this device
               except via explicit AI calls you trigger.
             </p>
-            <p>
+            <p style={{ margin: '8px 0 0' }}>
               <a
                 href="https://github.com/Nnnsightnnn/limn"
                 target="_blank"
                 rel="noreferrer"
-                className="text-ember-400 underline underline-offset-2"
+                style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}
               >
                 Source on GitHub →
               </a>

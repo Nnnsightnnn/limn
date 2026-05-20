@@ -1,5 +1,6 @@
-// Step-by-step walkthrough wizard: one slot visible at a time, with a clickable
-// stepper, keyboard nav (← / →), and slide transitions between steps.
+// The Wizard — "A Style Workshop in Six Movements". One movement visible at a
+// time, with a magazine-style TOC stepper, keyboard nav (← / →), and slide
+// transitions between movements.
 
 import { useEffect, useState } from 'react'
 import {
@@ -21,7 +22,7 @@ import {
 } from '../data/vocabulary'
 import { suggestForSlot } from '../lib/openrouter'
 import type { LimnState } from '../lib/useLimnState'
-import { AISuggestButton, ChipCloud, ChipRow } from './chip-primitives'
+import { AISuggestButton, Chip, ChipCloud, ChipRow } from './chip-primitives'
 import { PopularPrompts } from './PopularPrompts'
 import { SlotCard } from './SlotCard'
 
@@ -35,10 +36,12 @@ const STEPS: StepDef[] = [
   { num: 1, title: 'Subject', hint: 'what the image is about' },
   { num: 2, title: 'Medium & Style', hint: "how it's rendered + artistic lineage" },
   { num: 3, title: 'Scene', hint: 'environment + light + time' },
-  { num: 4, title: 'Mood & Color', hint: 'emotional + palette tone' },
+  { num: 4, title: 'Mood & Colour', hint: 'emotional + palette tone' },
   { num: 5, title: 'Camera', hint: 'composition + shot + angle + lens' },
   { num: 6, title: 'Parameters', hint: 'output flags' },
 ]
+
+const ROMAN_PREFIX = ['I.', 'II.', 'III.', 'IV.', 'V.', 'VI.']
 
 export function WizardMode({ state }: { state: LimnState }) {
   const { slots, setSlots, toggleChip, params, setParams, settings, setFreeform, setMode } = state
@@ -100,33 +103,99 @@ export function WizardMode({ state }: { state: LimnState }) {
   const current = STEPS[active]
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
+      {/* Workshop header */}
+      <header
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr auto',
+          alignItems: 'end',
+          borderBottom: '2px solid var(--color-rule)',
+          paddingBottom: 14,
+          gap: 24,
+        }}
+      >
+        <div>
+          <div className="kicker">
+            The Wizard &nbsp;·&nbsp; A Style Workshop in Six Movements
+          </div>
+          <h2
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(36px, 5vw, 56px)',
+              fontWeight: 500,
+              lineHeight: 1,
+              letterSpacing: '-0.02em',
+              margin: '8px 0 0',
+              color: 'var(--color-ink)',
+            }}
+          >
+            Composing
+            <span
+              style={{
+                fontStyle: 'italic',
+                fontWeight: 400,
+                color: 'var(--color-accent)',
+                fontSize: '0.7em',
+                padding: '0 0.1em',
+              }}
+            >
+              &amp;
+            </span>
+            Depicting
+          </h2>
+          <p
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontStyle: 'italic',
+              fontSize: 18,
+              color: 'var(--color-ink-soft)',
+              margin: '6px 0 0',
+            }}
+          >
+            Six steps from a vague notion to a prompt that prints.
+          </p>
+        </div>
+        <div
+          style={{
+            textAlign: 'right',
+            fontFamily: 'var(--font-sans)',
+            fontSize: 10.5,
+            letterSpacing: '0.20em',
+            textTransform: 'uppercase',
+            color: 'var(--color-ink-mute)',
+          }}
+        >
+          Movement <span className="num" style={{ color: 'var(--color-accent)', fontWeight: 600 }}>
+            {ROMAN_PREFIX[active]?.replace('.', '')}
+          </span>{' '}
+          of <span className="num">VI</span>
+          <br />
+          <span className="num">·</span> use <kbd style={kbdStyle}>←</kbd>{' '}
+          <kbd style={kbdStyle}>→</kbd> <span className="num">·</span>
+        </div>
+      </header>
+
       <Stepper active={active} counts={counts} onPick={go} />
 
       <div key={active} className={dir > 0 ? 'limn-slide-in-r' : 'limn-slide-in-l'}>
         <SlotCard step={current.num} title={current.title} hint={current.hint}>
           {active === 0 && (
             <>
-              <div className="flex flex-wrap gap-1.5 mb-2">
-                {SUBJECT_SUBTYPES.map((st) => (
-                  <button
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {SUBJECT_SUBTYPES.map((st, i) => (
+                  <Chip
                     key={st.value}
-                    type="button"
+                    label={st.label}
+                    active={slots.subjectSubType === st.value}
                     onClick={() =>
                       setSlots((prev) => ({
                         ...prev,
                         subjectSubType: prev.subjectSubType === st.value ? null : st.value,
                       }))
                     }
-                    className={
-                      'text-xs px-3 py-1 rounded-full border transition-colors ' +
-                      (slots.subjectSubType === st.value
-                        ? 'bg-ink-700 border-ink-600 text-ink-100'
-                        : 'bg-ink-900 border-ink-800 text-ink-300 hover:border-ink-600')
-                    }
-                  >
-                    {st.label}
-                  </button>
+                    tight={i % 3 === 1}
+                  />
                 ))}
               </div>
               <textarea
@@ -134,13 +203,11 @@ export function WizardMode({ state }: { state: LimnState }) {
                 onChange={(e) => setSlots((p) => ({ ...p, subject: e.target.value }))}
                 placeholder="e.g. A medieval knight standing in a misty forest at dawn"
                 rows={2}
-                className="w-full bg-ink-950 border border-ink-800 rounded-md px-3 py-2 text-sm text-ink-100 placeholder:text-ink-500 focus:outline-none focus:border-ember-500"
+                className="field-textarea"
               />
               {slots.subjectSubType && (
-                <div className="space-y-1">
-                  <div className="text-[10px] uppercase tracking-wider text-ink-400">
-                    Example starters — click to use
-                  </div>
+                <div>
+                  <div className="group-label">Example starters — click to use</div>
                   <div className="flex flex-wrap gap-1.5">
                     {SUBJECT_SUBTYPES.find((s) => s.value === slots.subjectSubType)?.examples.map(
                       (ex) => (
@@ -148,7 +215,7 @@ export function WizardMode({ state }: { state: LimnState }) {
                           key={ex}
                           type="button"
                           onClick={() => setSlots((p) => ({ ...p, subject: ex }))}
-                          className="text-xs px-3 py-1 rounded-full bg-ink-800/60 border border-ink-700 text-ink-300 hover:border-ember-500 hover:text-ember-400 transition-colors"
+                          className="chip-ai"
                         >
                           {ex}
                         </button>
@@ -166,8 +233,7 @@ export function WizardMode({ state }: { state: LimnState }) {
 
           {active === 1 && (
             <>
-              <div>
-                <div className="text-xs uppercase tracking-wider text-ink-400 mb-2">Medium</div>
+              <Shelf title="Medium" cabinet="I" count={`${slots.medium.length} chosen`}>
                 <ChipCloud
                   groups={MEDIUMS.groups.map((g) => ({
                     name: g.name,
@@ -180,9 +246,9 @@ export function WizardMode({ state }: { state: LimnState }) {
                   onRequest={aiSuggest('Medium', MEDIUMS.description)}
                   onPick={(v) => toggleChip('medium', v)}
                 />
-              </div>
-              <div className="pt-2 border-t border-ink-800">
-                <div className="text-xs uppercase tracking-wider text-ink-400 mb-2">Art movement</div>
+              </Shelf>
+
+              <Shelf title="Movement & School" cabinet="II">
                 <ChipCloud
                   groups={ART_MOVEMENTS.groups.map((g) => ({
                     name: g.name,
@@ -191,19 +257,17 @@ export function WizardMode({ state }: { state: LimnState }) {
                   selected={slots.medium}
                   onToggle={(v) => toggleChip('medium', v)}
                 />
-              </div>
-              <div className="pt-2 border-t border-ink-800">
-                <div className="text-xs uppercase tracking-wider text-ink-400 mb-2">
-                  Artists / directors / cinematographers
-                </div>
+              </Shelf>
+
+              <Shelf title="Artists & Directors" cabinet="III" count="free hand">
                 <input
                   type="text"
                   value={slots.artists}
                   onChange={(e) => setSlots((p) => ({ ...p, artists: e.target.value }))}
-                  placeholder="e.g. Roger Deakins, Wes Anderson"
-                  className="w-full bg-ink-950 border border-ink-800 rounded-md px-3 py-2 text-sm text-ink-100 placeholder:text-ink-500 focus:outline-none focus:border-ember-500"
+                  placeholder="e.g. Roger Deakins, Wes Anderson, Hayao Miyazaki"
+                  className="field-input"
                 />
-                <div className="mt-2">
+                <div style={{ marginTop: 18 }}>
                   <ChipCloud
                     groups={ARTISTS_AND_DIRECTORS.groups.map((g) => ({
                       name: g.name,
@@ -218,14 +282,13 @@ export function WizardMode({ state }: { state: LimnState }) {
                     }
                   />
                 </div>
-              </div>
+              </Shelf>
             </>
           )}
 
           {active === 2 && (
             <>
-              <div>
-                <div className="text-xs uppercase tracking-wider text-ink-400 mb-2">Environment</div>
+              <Shelf title="Environment" cabinet="I">
                 <ChipCloud
                   groups={ENVIRONMENTS.groups.map((g) => ({
                     name: g.name,
@@ -238,9 +301,8 @@ export function WizardMode({ state }: { state: LimnState }) {
                   onRequest={aiSuggest('Environment', ENVIRONMENTS.description)}
                   onPick={(v) => toggleChip('environment', v)}
                 />
-              </div>
-              <div className="pt-2 border-t border-ink-800">
-                <div className="text-xs uppercase tracking-wider text-ink-400 mb-2">Lighting</div>
+              </Shelf>
+              <Shelf title="Lighting" cabinet="II">
                 <ChipCloud
                   groups={LIGHTING.groups.map((g) => ({
                     name: g.name,
@@ -249,22 +311,20 @@ export function WizardMode({ state }: { state: LimnState }) {
                   selected={slots.lighting}
                   onToggle={(v) => toggleChip('lighting', v)}
                 />
-              </div>
-              <div className="pt-2 border-t border-ink-800">
-                <div className="text-xs uppercase tracking-wider text-ink-400 mb-2">Time of day</div>
+              </Shelf>
+              <Shelf title="Time of day" cabinet="III">
                 <ChipRow
                   chips={TIME_OF_DAY.groups[0].chips.map(asLabel)}
                   selected={slots.timeOfDay}
                   onToggle={(v) => toggleChip('timeOfDay', v)}
                 />
-              </div>
+              </Shelf>
             </>
           )}
 
           {active === 3 && (
             <>
-              <div>
-                <div className="text-xs uppercase tracking-wider text-ink-400 mb-2">Mood</div>
+              <Shelf title="Mood" cabinet="I">
                 <ChipCloud
                   groups={MOOD.groups.map((g) => ({ name: g.name, chips: g.chips.map(asLabel) }))}
                   selected={slots.mood}
@@ -274,22 +334,20 @@ export function WizardMode({ state }: { state: LimnState }) {
                   onRequest={aiSuggest('Mood', MOOD.description)}
                   onPick={(v) => toggleChip('mood', v)}
                 />
-              </div>
-              <div className="pt-2 border-t border-ink-800">
-                <div className="text-xs uppercase tracking-wider text-ink-400 mb-2">Color</div>
+              </Shelf>
+              <Shelf title="Colour" cabinet="II">
                 <ChipCloud
                   groups={COLOR.groups.map((g) => ({ name: g.name, chips: g.chips.map(asLabel) }))}
                   selected={slots.color}
                   onToggle={(v) => toggleChip('color', v)}
                 />
-              </div>
+              </Shelf>
             </>
           )}
 
           {active === 4 && (
             <>
-              <div>
-                <div className="text-xs uppercase tracking-wider text-ink-400 mb-2">Composition</div>
+              <Shelf title="Composition" cabinet="I">
                 <ChipCloud
                   groups={COMPOSITION.groups.map((g) => ({
                     name: g.name,
@@ -298,25 +356,22 @@ export function WizardMode({ state }: { state: LimnState }) {
                   selected={slots.composition}
                   onToggle={(v) => toggleChip('composition', v)}
                 />
-              </div>
-              <div className="pt-2 border-t border-ink-800">
-                <div className="text-xs uppercase tracking-wider text-ink-400 mb-2">Shot type</div>
+              </Shelf>
+              <Shelf title="Shot type" cabinet="II">
                 <ChipRow
                   chips={SHOT_TYPES.groups[0].chips.map(asLabel)}
                   selected={slots.shotType}
                   onToggle={(v) => toggleChip('shotType', v)}
                 />
-              </div>
-              <div className="pt-2 border-t border-ink-800">
-                <div className="text-xs uppercase tracking-wider text-ink-400 mb-2">Camera angle</div>
+              </Shelf>
+              <Shelf title="Camera angle" cabinet="III">
                 <ChipRow
                   chips={CAMERA_ANGLES.groups[0].chips.map(asLabel)}
                   selected={slots.cameraAngle}
                   onToggle={(v) => toggleChip('cameraAngle', v)}
                 />
-              </div>
-              <div className="pt-2 border-t border-ink-800">
-                <div className="text-xs uppercase tracking-wider text-ink-400 mb-2">Camera & lens</div>
+              </Shelf>
+              <Shelf title="Camera & lens" cabinet="IV">
                 <ChipCloud
                   groups={CAMERA_LENS.groups.map((g) => ({
                     name: g.name,
@@ -325,55 +380,43 @@ export function WizardMode({ state }: { state: LimnState }) {
                   selected={slots.cameraLens}
                   onToggle={(v) => toggleChip('cameraLens', v)}
                 />
-              </div>
+              </Shelf>
             </>
           )}
 
           {active === 5 && (
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-5">
               <div>
-                <Label>Aspect ratio</Label>
+                <div className="group-label">Aspect ratio</div>
                 <div className="flex flex-wrap gap-1.5">
-                  {ASPECT_RATIOS.map((ar) => (
-                    <button
+                  {ASPECT_RATIOS.map((ar, i) => (
+                    <Chip
                       key={ar}
-                      type="button"
+                      label={ar}
+                      active={params.aspectRatio === ar}
                       onClick={() => setParams((p) => ({ ...p, aspectRatio: ar }))}
-                      className={
-                        'text-xs px-2.5 py-1 rounded-md border transition-colors ' +
-                        (params.aspectRatio === ar
-                          ? 'bg-ember-500 border-ember-500 text-ink-950 font-medium'
-                          : 'bg-ink-900 border-ink-800 text-ink-300 hover:border-ember-500')
-                      }
-                    >
-                      {ar}
-                    </button>
+                      tight={i % 3 === 1}
+                    />
                   ))}
                 </div>
               </div>
 
               <div>
-                <Label>Model version</Label>
+                <div className="group-label">Model version</div>
                 <div className="flex flex-wrap gap-1.5">
-                  {MJ_VERSIONS.map((v) => (
-                    <button
+                  {MJ_VERSIONS.map((v, i) => (
+                    <Chip
                       key={v}
-                      type="button"
+                      label={v}
+                      active={params.version === v}
                       onClick={() => setParams((p) => ({ ...p, version: v }))}
-                      className={
-                        'text-xs px-2.5 py-1 rounded-md border transition-colors ' +
-                        (params.version === v
-                          ? 'bg-ember-500 border-ember-500 text-ink-950 font-medium'
-                          : 'bg-ink-900 border-ink-800 text-ink-300 hover:border-ember-500')
-                      }
-                    >
-                      {v}
-                    </button>
+                      tight={i % 3 === 1}
+                    />
                   ))}
                 </div>
               </div>
 
-              <div className="sm:col-span-2 flex flex-wrap gap-4">
+              <div className="sm:col-span-2 flex flex-wrap gap-6">
                 <Toggle
                   label="--style raw"
                   checked={params.styleRaw}
@@ -419,23 +462,23 @@ export function WizardMode({ state }: { state: LimnState }) {
               />
 
               <div>
-                <Label>Seed</Label>
+                <div className="group-label">Seed</div>
                 <input
                   type="text"
                   value={params.seed}
                   onChange={(e) => setParams((p) => ({ ...p, seed: e.target.value }))}
                   placeholder="empty = random"
-                  className="w-full bg-ink-950 border border-ink-800 rounded-md px-3 py-1.5 text-xs text-ink-100 placeholder:text-ink-500 focus:outline-none focus:border-ember-500"
+                  className="field-input"
                 />
               </div>
               <div>
-                <Label>Negative prompt (--no)</Label>
+                <div className="group-label">Negative prompt (--no)</div>
                 <input
                   type="text"
                   value={params.negative}
                   onChange={(e) => setParams((p) => ({ ...p, negative: e.target.value }))}
                   placeholder="e.g. blur, text, signature"
-                  className="w-full bg-ink-950 border border-ink-800 rounded-md px-3 py-1.5 text-xs text-ink-100 placeholder:text-ink-500 focus:outline-none focus:border-ember-500"
+                  className="field-input"
                 />
               </div>
             </div>
@@ -452,14 +495,89 @@ export function WizardMode({ state }: { state: LimnState }) {
 
       {isWizardEmpty && (
         <PopularPrompts
-          heading="Or start from a popular prompt"
-          subheading="Click to load into Free-form — you can refine it there, or use Parse to wizard to fill these slots."
+          heading="Or begin from a popular prompt"
+          subheading="Click any plate to load it into Free Studio — you can refine it there, or use Parse to wizard to fill these movements."
           onPick={(p) => {
             setFreeform(p.prompt)
             setMode('freeform')
           }}
         />
       )}
+    </div>
+  )
+}
+
+const kbdStyle: React.CSSProperties = {
+  fontFamily: 'var(--font-mono)',
+  fontSize: 9.5,
+  background: 'var(--color-paper)',
+  color: 'var(--color-ink)',
+  padding: '2px 5px',
+  border: '1px solid var(--color-rule)',
+  letterSpacing: 0,
+  textTransform: 'none',
+}
+
+function Shelf({
+  title,
+  cabinet,
+  count,
+  children,
+}: {
+  title: string
+  cabinet: string
+  count?: string
+  children: React.ReactNode
+}) {
+  return (
+    <div
+      style={{
+        borderTop: '1px solid var(--color-rule)',
+        paddingTop: 18,
+        marginTop: 32,
+      }}
+    >
+      <header
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'baseline',
+          marginBottom: 14,
+        }}
+      >
+        <h3
+          style={{
+            margin: 0,
+            fontFamily: 'var(--font-display)',
+            fontStyle: 'italic',
+            fontWeight: 500,
+            fontSize: 28,
+            letterSpacing: '-0.01em',
+            color: 'var(--color-ink)',
+          }}
+        >
+          {title}
+        </h3>
+        <div
+          style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: 10.5,
+            letterSpacing: '0.22em',
+            textTransform: 'uppercase',
+            color: 'var(--color-ink-mute)',
+          }}
+        >
+          Cabinet {cabinet}
+          {count && (
+            <>
+              {' '}
+              &nbsp;·&nbsp;{' '}
+              <span style={{ color: 'var(--color-accent)', fontWeight: 600 }}>{count}</span>
+            </>
+          )}
+        </div>
+      </header>
+      {children}
     </div>
   )
 }
@@ -474,57 +592,28 @@ function Stepper({
   onPick: (i: number) => void
 }) {
   return (
-    <nav aria-label="Wizard steps" className="flex items-center gap-1 select-none">
+    <nav className="toc" aria-label="Movements">
       {STEPS.map((s, i) => {
         const isActive = i === active
         const filled = counts[i] > 0
+        const cls = ['toc-step', isActive && 'is-active', !isActive && filled && 'is-done']
+          .filter(Boolean)
+          .join(' ')
         return (
-          <button
-            key={s.num}
-            type="button"
-            onClick={() => onPick(i)}
-            aria-current={isActive ? 'step' : undefined}
-            className={
-              'group flex-1 min-w-0 flex flex-col items-center gap-1.5 py-2 px-1 rounded-md transition-colors ' +
-              (isActive ? 'bg-ink-900/60' : 'hover:bg-ink-900/30')
-            }
-          >
-            <div className="flex items-center w-full">
-              <span
-                className={
-                  'h-px flex-1 ' + (i === 0 ? 'opacity-0' : filled || isActive ? 'bg-ember-700' : 'bg-ink-800')
-                }
-              />
-              <span
-                className={
-                  'mx-1.5 inline-flex items-center justify-center text-[10px] font-mono tabular-nums rounded-full transition-all ' +
-                  (isActive
-                    ? 'h-6 w-6 bg-ember-500 text-ink-950 ring-2 ring-ember-500/40'
-                    : filled
-                      ? 'h-5 w-5 bg-ember-700 text-ink-100'
-                      : 'h-5 w-5 bg-ink-800 text-ink-400 border border-ink-700')
-                }
-              >
-                {String(s.num).padStart(2, '0')}
-              </span>
-              <span
-                className={
-                  'h-px flex-1 ' +
-                  (i === STEPS.length - 1 ? 'opacity-0' : filled && i < active ? 'bg-ember-700' : 'bg-ink-800')
-                }
-              />
-            </div>
-            <span
-              className={
-                'text-[11px] truncate w-full text-center ' +
-                (isActive ? 'text-ink-100' : filled ? 'text-ink-300' : 'text-ink-400 group-hover:text-ink-300')
-              }
-            >
-              {s.title}
-              {counts[i] > 0 && !isActive && (
-                <span className="ml-1 text-ember-500">·{counts[i]}</span>
+          <button key={s.num} type="button" className={cls} onClick={() => onPick(i)}>
+            <div className="row">
+              <span className="roman">{ROMAN_PREFIX[i]}</span> Movement
+              {filled && !isActive && (
+                <span className="pill">·{counts[i]}</span>
               )}
-            </span>
+              {isActive && (
+                <span className="now-editing">
+                  now editing
+                  <span className="caret" />
+                </span>
+              )}
+            </div>
+            <div className="title">{s.title}</div>
           </button>
         )
       })}
@@ -546,28 +635,49 @@ function Nav({
   const isFirst = active === 0
   const isLast = active === total - 1
   return (
-    <div className="flex items-center justify-between pt-1">
-      <button
-        type="button"
-        onClick={onPrev}
-        disabled={isFirst}
-        className="text-xs px-3 py-1.5 rounded-md border border-ink-800 text-ink-300 hover:border-ink-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-      >
-        ← Back
+    <div
+      style={{
+        marginTop: 24,
+        paddingTop: 16,
+        borderTop: '1px solid var(--color-rule)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}
+    >
+      <button type="button" onClick={onPrev} disabled={isFirst} className="btn">
+        ← {isFirst ? 'Beginning' : `Back to ${STEPS[active - 1].title}`}
       </button>
-      <span className="text-[10px] uppercase tracking-wider text-ink-500 font-mono">
-        {String(active + 1).padStart(2, '0')} / {String(total).padStart(2, '0')} ·
-        <span className="ml-1 normal-case tracking-normal">use ← → keys</span>
+      <span
+        style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: 10.5,
+          letterSpacing: '0.20em',
+          textTransform: 'uppercase',
+          color: 'var(--color-ink-mute)',
+        }}
+      >
+        Movement{' '}
+        <span className="num" style={{ color: 'var(--color-accent)' }}>
+          {ROMAN_PREFIX[active]?.replace('.', '')}
+        </span>{' '}
+        / <span className="num">{ROMAN_PREFIX[total - 1]?.replace('.', '')}</span>
       </span>
       {isLast ? (
-        <span className="text-xs px-3 py-1.5 rounded-md text-ember-500/80">all done — copy from the preview →</span>
-      ) : (
-        <button
-          type="button"
-          onClick={onNext}
-          className="text-xs px-3 py-1.5 rounded-md bg-ember-500 text-ink-950 font-medium hover:bg-ember-400 transition-colors"
+        <span
+          style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: 10.5,
+            letterSpacing: '0.20em',
+            textTransform: 'uppercase',
+            color: 'var(--color-accent)',
+          }}
         >
-          Next →
+          all set — see the manuscript →
+        </span>
+      ) : (
+        <button type="button" onClick={onNext} className="btn primary">
+          Onward to {STEPS[active + 1].title} →
         </button>
       )}
     </div>
@@ -599,10 +709,6 @@ function stepCounts(state: LimnState): number[] {
   return [subjectCount, mediumCount, sceneCount, moodCount, cameraCount, paramsCount]
 }
 
-function Label({ children }: { children: React.ReactNode }) {
-  return <div className="text-[10px] uppercase tracking-wider text-ink-400 mb-1.5">{children}</div>
-}
-
 function Toggle({
   label,
   checked,
@@ -613,14 +719,25 @@ function Toggle({
   onChange: (v: boolean) => void
 }) {
   return (
-    <label className="inline-flex items-center gap-2 text-xs text-ink-200 cursor-pointer select-none">
+    <label
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 8,
+        cursor: 'pointer',
+        userSelect: 'none',
+        fontFamily: 'var(--font-mono)',
+        fontSize: 13,
+        color: 'var(--color-ink)',
+      }}
+    >
       <input
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="accent-ember-500"
+        style={{ accentColor: 'var(--color-accent)' }}
       />
-      <span className="font-mono">{label}</span>
+      <span>{label}</span>
     </label>
   )
 }
@@ -643,11 +760,28 @@ function Slider({
   const off = value < 0
   return (
     <div>
-      <div className="flex items-baseline justify-between mb-1">
-        <span className="text-[10px] uppercase tracking-wider text-ink-400">{label}</span>
-        <span className="text-xs font-mono text-ink-200">{off ? 'off' : value}</span>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          marginBottom: 4,
+        }}
+      >
+        <span className="group-label" style={{ margin: 0 }}>
+          {label}
+        </span>
+        <span
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 12,
+            color: off ? 'var(--color-ink-mute)' : 'var(--color-ink)',
+          }}
+        >
+          {off ? 'off' : value}
+        </span>
       </div>
-      <div className="flex items-center gap-2">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <input
           type="range"
           min={min}
@@ -655,13 +789,9 @@ function Slider({
           step={step}
           value={off ? min : value}
           onChange={(e) => onChange(parseFloat(e.target.value))}
-          className="flex-1 accent-ember-500"
+          style={{ flex: 1, accentColor: 'var(--color-accent)' }}
         />
-        <button
-          type="button"
-          onClick={() => onChange(off ? min : -1)}
-          className="text-[10px] px-2 py-0.5 rounded border border-ink-700 text-ink-300 hover:border-ember-500 hover:text-ember-400"
-        >
+        <button type="button" onClick={() => onChange(off ? min : -1)} className="btn">
           {off ? 'set' : 'clear'}
         </button>
       </div>

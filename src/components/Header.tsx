@@ -1,3 +1,7 @@
+// The magazine masthead: drafting strip + big Bodoni "Limn" + masthead-strap +
+// section-nav (Wizard / Free-form / Folio / Settings).
+
+import { useEffect, useState } from 'react'
 import type { Mode } from '../lib/types'
 
 export function Header({
@@ -7,6 +11,9 @@ export function Header({
   onNewSession,
   hasKey,
   dirty,
+  revision,
+  touchedSteps,
+  totalSteps,
 }: {
   mode: Mode
   setMode: (m: Mode) => void
@@ -14,84 +21,114 @@ export function Header({
   onNewSession: () => void
   hasKey: boolean
   dirty: boolean
+  revision: number
+  touchedSteps: number
+  totalSteps: number
 }) {
+  // Lightweight "X seconds ago" for the autosave indicator. Resets on dirty changes.
+  const [savedAt, setSavedAt] = useState<number>(() => Date.now())
+  const [tick, setTick] = useState(0)
+
+  useEffect(() => {
+    setSavedAt(Date.now())
+  }, [revision])
+
+  useEffect(() => {
+    const id = window.setInterval(() => setTick((t) => t + 1), 1000)
+    return () => window.clearInterval(id)
+  }, [])
+
+  const ago = formatAgo(Date.now() - savedAt, tick)
+
   return (
-    <header className="border-b border-ink-800 bg-ink-900/60 backdrop-blur sticky top-0 z-10">
-      <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between gap-4">
-        <a
-          href="/limn/"
-          className="flex items-center gap-2 text-lg font-semibold text-ink-100 hover:text-ember-400 transition-colors"
-        >
-          <span className="text-ember-500">◐</span>
-          <span>Limn</span>
-        </a>
+    <header className="px-14 pt-7 pb-1">
+      <div className="max-w-[1320px] mx-auto">
+        <div className="draft-strip" aria-label="Drafting status">
+          <div className="left">
+            <span className="pill"><span className="live-dot" />Working Proof</span>
+            &nbsp;&nbsp;Vol. I · No. 02 &nbsp;·&nbsp;{' '}
+            <span className="accent">{dirty ? 'drafting' : 'at rest'}</span>
+          </div>
+          <div className="center">
+            Revision <span className="accent num">{String(revision).padStart(2, '0')}</span>
+            &nbsp;·&nbsp; auto-saved <span className="accent">{ago}</span>
+            &nbsp;·&nbsp; {touchedSteps} of {totalSteps} movements touched
+          </div>
+          <div className="right">
+            Composer: <span className="accent">you</span>
+            &nbsp;·&nbsp;
+            <button
+              type="button"
+              onClick={onNewSession}
+              title={dirty ? 'Clear the current prompt (will confirm)' : 'Start a fresh prompt'}
+              className="underline-offset-4 hover:text-[var(--color-accent)] transition-colors"
+              style={{ background: 'none', border: 0, font: 'inherit', letterSpacing: 'inherit', textTransform: 'inherit', cursor: 'pointer', padding: 0, color: 'inherit' }}
+              aria-label="New session"
+            >
+              ＋ new draft
+            </button>
+          </div>
+        </div>
 
-        <nav className="flex gap-1 bg-ink-800/60 p-1 rounded-full text-sm" role="tablist">
-          <ModeButton active={mode === 'wizard'} onClick={() => setMode('wizard')}>
-            Wizard
-          </ModeButton>
-          <ModeButton active={mode === 'freeform'} onClick={() => setMode('freeform')}>
-            Free-form
-          </ModeButton>
-        </nav>
+        <h1 className="masthead">
+          <span className="crescent" aria-hidden="true" />
+          Limn
+        </h1>
 
-        <div className="flex items-center gap-3">
+        <div className="masthead-strap">
+          <hr />
+          <div className="tag whitespace-nowrap">
+            An Atelier in your Browser &nbsp;·&nbsp; Composing in Progress &nbsp;·&nbsp; Bring Your Own Key
+          </div>
+          <hr />
+        </div>
+
+        <nav className="section-nav mt-6" aria-label="Sections">
           <button
             type="button"
-            onClick={onNewSession}
-            title={dirty ? 'Clear the current prompt (will confirm)' : 'Start a fresh prompt'}
-            className={
-              'text-xs px-3 py-1.5 rounded-md border transition-colors flex items-center gap-1.5 ' +
-              (dirty
-                ? 'bg-ink-800 border-ink-700 text-ink-100 hover:border-ember-500 hover:text-ember-400'
-                : 'bg-transparent border-ink-800 text-ink-400 hover:text-ink-100 hover:border-ink-700')
-            }
-            aria-label="New session"
+            className={mode === 'wizard' ? 'is-active' : ''}
+            onClick={() => setMode('wizard')}
           >
-            <span aria-hidden>+</span>
-            <span>New</span>
+            The Wizard
           </button>
-
+          <span className="sep">/</span>
           <button
             type="button"
-            onClick={onOpenSettings}
-            className="text-sm text-ink-400 hover:text-ink-100 transition-colors flex items-center gap-1.5"
-            aria-label="Open settings"
+            className={mode === 'freeform' ? 'is-active' : ''}
+            onClick={() => setMode('freeform')}
           >
-            <span>⚙</span>
-            {!hasKey && (
-              <span className="text-xs text-ember-400 hidden sm:inline">add API key</span>
+            The Free Studio
+          </button>
+          <span className="sep">/</span>
+          <button
+            type="button"
+            onClick={() => {
+              const el = document.getElementById('folio')
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }}
+          >
+            The Folio
+          </button>
+          <span className="sep">/</span>
+          <button type="button" onClick={onOpenSettings}>
+            {hasKey ? 'Settings' : (
+              <>
+                Settings <span style={{ color: 'var(--color-accent)', marginLeft: 8 }}>add API key</span>
+              </>
             )}
           </button>
-        </div>
+        </nav>
       </div>
     </header>
   )
 }
 
-function ModeButton({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean
-  onClick: () => void
-  children: React.ReactNode
-}) {
-  return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={active}
-      onClick={onClick}
-      className={
-        'px-4 py-1.5 rounded-full transition-colors ' +
-        (active
-          ? 'bg-ember-500 text-ink-950 font-medium'
-          : 'text-ink-300 hover:text-ink-100')
-      }
-    >
-      {children}
-    </button>
-  )
+function formatAgo(ms: number, _tick: number): string {
+  void _tick // keep the component re-rendering on tick changes
+  const sec = Math.max(0, Math.floor(ms / 1000))
+  if (sec < 60) return `${sec}s ago`
+  const min = Math.floor(sec / 60)
+  if (min < 60) return `${min}m ago`
+  const hr = Math.floor(min / 60)
+  return `${hr}h ago`
 }
