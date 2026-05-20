@@ -489,8 +489,10 @@ export function WizardMode({ state }: { state: LimnState }) {
       <Nav
         active={active}
         total={STEPS.length}
+        counts={counts}
         onPrev={() => go(active - 1)}
         onNext={() => go(active + 1)}
+        onPick={go}
       />
 
       {isWizardEmpty && (
@@ -624,13 +626,17 @@ function Stepper({
 function Nav({
   active,
   total,
+  counts,
   onPrev,
   onNext,
+  onPick,
 }: {
   active: number
   total: number
+  counts: number[]
   onPrev: () => void
   onNext: () => void
+  onPick: (i: number) => void
 }) {
   const isFirst = active === 0
   const isLast = active === total - 1
@@ -640,46 +646,65 @@ function Nav({
         marginTop: 24,
         paddingTop: 16,
         borderTop: '1px solid var(--color-rule)',
-        display: 'flex',
-        justifyContent: 'space-between',
+        display: 'grid',
+        gridTemplateColumns: '1fr auto 1fr',
         alignItems: 'center',
+        gap: 24,
       }}
     >
-      <button type="button" onClick={onPrev} disabled={isFirst} className="btn">
-        ← {isFirst ? 'Beginning' : `Back to ${STEPS[active - 1].title}`}
-      </button>
-      <span
-        style={{
-          fontFamily: 'var(--font-sans)',
-          fontSize: 10.5,
-          letterSpacing: '0.20em',
-          textTransform: 'uppercase',
-          color: 'var(--color-ink-mute)',
-        }}
-      >
-        Movement{' '}
-        <span className="num" style={{ color: 'var(--color-accent)' }}>
-          {ROMAN_PREFIX[active]?.replace('.', '')}
-        </span>{' '}
-        / <span className="num">{ROMAN_PREFIX[total - 1]?.replace('.', '')}</span>
-      </span>
-      {isLast ? (
-        <span
-          style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: 10.5,
-            letterSpacing: '0.20em',
-            textTransform: 'uppercase',
-            color: 'var(--color-accent)',
-          }}
-        >
-          all set — see the manuscript →
-        </span>
-      ) : (
-        <button type="button" onClick={onNext} className="btn primary">
-          Onward to {STEPS[active + 1].title} →
+      <div>
+        <button type="button" onClick={onPrev} disabled={isFirst} className="btn">
+          ← {isFirst ? 'Beginning' : `Back to ${STEPS[active - 1].title}`}
         </button>
-      )}
+      </div>
+
+      {/* Page-number strip — jump directly to any movement */}
+      <nav className="page-nums" aria-label="Jump to movement">
+        {STEPS.map((s, i) => {
+          const isActive = i === active
+          const filled = counts[i] > 0
+          const cls = [
+            'page-num',
+            isActive && 'is-active',
+            !isActive && filled && 'is-done',
+          ]
+            .filter(Boolean)
+            .join(' ')
+          return (
+            <button
+              key={s.num}
+              type="button"
+              className={cls}
+              onClick={() => onPick(i)}
+              title={`${ROMAN_PREFIX[i]} ${s.title}`}
+              aria-current={isActive ? 'step' : undefined}
+            >
+              <span className="page-num-roman">{ROMAN_PREFIX[i]?.replace('.', '')}</span>
+              <span className="page-num-title">{s.title}</span>
+            </button>
+          )
+        })}
+      </nav>
+
+      <div style={{ textAlign: 'right' }}>
+        {isLast ? (
+          <span
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 10.5,
+              letterSpacing: '0.20em',
+              textTransform: 'uppercase',
+              color: 'var(--color-accent)',
+            }}
+          >
+            all set — see the manuscript →
+          </span>
+        ) : (
+          <button type="button" onClick={onNext} className="btn primary">
+            Onward to {STEPS[active + 1].title} →
+          </button>
+        )}
+      </div>
     </div>
   )
 }

@@ -254,7 +254,27 @@ input, textarea, button, select { color: inherit; font-family: inherit; }
   transition: background-color 160ms ease;
 }
 .toc-step:last-child { border-right: 0; }
-.toc-step:hover { background: var(--color-accent-soft); }
+.toc-step { position: relative; }
+.toc-step:hover {
+  background: var(--color-accent-soft);
+  box-shadow: inset 0 2px 0 0 var(--color-accent);
+}
+.toc-step:hover .title { color: var(--color-accent-deep); }
+.toc-step::after {
+  content: "jump →";
+  position: absolute;
+  right: 10px; bottom: 8px;
+  font-family: var(--font-hand);
+  font-size: 14px;
+  color: var(--color-accent);
+  opacity: 0;
+  transition: opacity 140ms ease;
+  pointer-events: none;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.toc-step:hover::after { opacity: 0.85; }
+.toc-step.is-active::after { content: none; }
 .toc-step .row {
   display: flex; align-items: baseline; gap: 10px;
   font-family: var(--font-sans);
@@ -310,6 +330,62 @@ input, textarea, button, select { color: inherit; font-family: inherit; }
   animation: limn-caret 1s steps(1) infinite;
 }
 @keyframes limn-caret { 50% { opacity: 0; } }
+
+/* ─────────────────────────────  PAGE NUMS (lower nav)  ───────────── */
+.page-nums {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--color-rule);
+  background: var(--color-paper);
+}
+.page-num {
+  background: none;
+  border: 0;
+  border-right: 1px solid var(--color-rule-soft);
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 64px;
+  color: var(--color-ink-mute);
+  font-family: inherit;
+  transition: background 120ms ease, color 120ms ease;
+}
+.page-num:last-child { border-right: 0; }
+.page-num:hover {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-deep);
+}
+.page-num-roman {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--color-ink);
+}
+.page-num-title {
+  font-family: var(--font-sans);
+  font-size: 8.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-ink-mute);
+  white-space: nowrap;
+}
+.page-num:hover .page-num-roman { color: var(--color-accent); }
+.page-num.is-done .page-num-roman { color: var(--color-accent); }
+.page-num.is-active {
+  background: var(--color-ink);
+}
+.page-num.is-active .page-num-roman { color: var(--color-paper); }
+.page-num.is-active .page-num-title { color: var(--color-paper); }
+
+@media (max-width: 980px) {
+  .page-num { min-width: 0; padding: 6px 8px; }
+  .page-num-title { display: none; }
+}
 
 /* ─────────────────────────────  CHIPS  ───────────────────────────── */
 .chip {
