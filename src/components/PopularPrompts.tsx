@@ -8,6 +8,7 @@ import {
   type PopularPrompt,
   type PopularPromptCategory,
 } from '../data/popularPrompts'
+import { PLATE_IMAGES_BY_TITLE } from '../data/plateImages.generated'
 
 interface PopularPromptsProps {
   onPick: (prompt: PopularPrompt) => void
@@ -80,6 +81,8 @@ function PromptCard({
   index: number
   onPick: () => void
 }) {
+  const imageRel = prompt.image ?? PLATE_IMAGES_BY_TITLE[prompt.title]
+  const imageSrc = imageRel ? `${import.meta.env.BASE_URL}${imageRel}` : null
   return (
     <button
       type="button"
@@ -88,6 +91,7 @@ function PromptCard({
       className="archive-card"
     >
       <div className="img">
+        {imageSrc && <img src={imageSrc} alt="" loading="lazy" />}
         <span className="plate-no">Plate {ROMAN[index] ?? index + 1}</span>
       </div>
       <div className="title">{prompt.title}</div>

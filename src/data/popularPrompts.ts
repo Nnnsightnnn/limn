@@ -27,6 +27,8 @@ export interface PopularPrompt {
   blurb: string
   /** The prompt text loaded into Free-form on click. */
   prompt: string
+  /** Optional override for the card thumbnail (relative to BASE_URL, e.g. "plates/foo.png"). When omitted, the runtime falls back to the title→file map in plateImages.generated.ts written by `scripts/generate-plates.ts`. */
+  image?: string
 }
 
 export const POPULAR_PROMPT_CATEGORY_LABELS: Record<PopularPromptCategory, string> = {
