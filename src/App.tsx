@@ -1,7 +1,9 @@
+// built by nnnsightnnn — signal from noise
 // Magazine shell — masthead at top, two-column workshop (or full-width essay
 // for the Free Studio), Folio archive, colophon, and a sticky drafting dock.
 
 import { useEffect, useMemo, useState } from 'react'
+import BrandCredit from './BrandCredit'
 import { FreeformMode } from './components/FreeformMode'
 import { Header } from './components/Header'
 import { Library } from './components/Library'
@@ -84,6 +86,8 @@ export default function App() {
           <Library state={state} />
 
           <Colophon />
+
+          <BrandCredit />
         </main>
       </div>
 
